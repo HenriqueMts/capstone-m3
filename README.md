@@ -1,20 +1,20 @@
 # ![Adopet](src/assets/Logo.svg)
 
-A **AdoPet** foi desenvolvida com o intuito de conectar as pessoas que desejam adotar um pet com aqueles que necessitam encontrar um novo lar para os bichinhos.
+**AdoPet** Was developed to connect peoples hos want to adopt a pet with hos need's a new home for the pets.
 
-## Problema a ser resolvido
+## Issues to be solved
 
-Nós somos uma plataforma focada um desenvolver um espaço para animais carentes. A adopet tem como objetivo, construir uma ponte entre diferentes ONGs e amantes de animais à pessoas que desejam dar um novo lar com muito amor e carinho a um animalzinho.
+Adopet aims to help build a bridge between different NGOs and pet lovers.
 
-A organização Mundial de Saúde estima que só no Brasil existam mais de 30 milhões de animais abandonados, entre 10 milhões de gatos e 20 milhões de cães, a pandemia infelizmente apenas aumentou esse números.
+World Health Organization estimate's just in Brazil there are more than 30 millions homeless animals ho's need health care.
 
-A maior dificuldade de doar um animal é encontrar um dono que seja não só responsável, mas também tenha condições de dar amor e carinho. É aqui que entra a adopet, nossa plataforma disponibiliza para o usuário informações que consideramos cruciais para que o mesmo encontre um pet que melhor se encaixe no seu estilo de vida, dessa forma conseguimos acelerar o processo de adoção.
+The biggest dificulty is tri finding someone who's resposible and takes care of the animal, our plataform gives the user informations that are crucial to find the best person's possible.
 
-Porém é importante dizer que nós, como plataforma, apenas conectamos as pessoas ou ONGs, a decisão final de entregar o animal é da pessoa ou entidade que cadastrou o animal.
+is important to remind our platform just connect NGOs with people, we don't responsible to deliver the animal.
 
 ---
 
-## Features do Projeto
+## Features
 
 - Home
 - Cadastro
@@ -28,13 +28,11 @@ Porém é importante dizer que nós, como plataforma, apenas conectamos as pesso
 
 ---
 
-## Tecnologias
+## Technologies
 
 - ReactJS
 
-- Notion
-
-- Trello
+- Context API
 
 - Figma
 
@@ -42,7 +40,7 @@ Porém é importante dizer que nós, como plataforma, apenas conectamos as pesso
 
 ---
 
-## Bibliotecas
+## Lib's
 
 - Styled Components
 - Chakra
@@ -56,7 +54,7 @@ Porém é importante dizer que nós, como plataforma, apenas conectamos as pesso
 
 ---
 
-## Equipe
+## Team
 
 - [Douglas Leão -QA](https://github.com/elefantinhos2)
 - [Eduardo Henrique -QA](https://github.com/HenriqueMts)
