@@ -8,12 +8,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { Link, useHistory } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { useAuth } from "../../providers/AuthProvider"; // IMPORTANTE: Ajuste o caminho se necessário
 
 const Cadastro = () => {
-  const token = JSON.parse(localStorage.getItem("token"));
   const history = useHistory();
-  const axios = require("axios").default;
-  const BASE_URL = "https://adopet-api-cm3.herokuapp.com";
+
+  const { register: registerUser, user, loading } = useAuth();
   const [signupError, setSignupError] = useState("");
 
   const formSchema = yup.object().shape({
@@ -24,10 +24,10 @@ const Cadastro = () => {
     email: yup.string().required("Email obrigatório").email("E-mail inválido"),
     phone: yup
       .string()
-      .min(11, "Minimo 11 números")
+      .min(11, "Mínimo 11 números")
       .matches(
-        /^\(?[1-9]{2}\)? ?(?:[2-8]|9[1-9])[0-9]{3}\-?[0-9]{4}$/,
-        "Conter somente numeros"
+        /^\(?[1-9]{2}\)? ?(?:[2-8]|9[1-9])[0-9]{3}-?[0-9]{4}$/,
+        "Deve conter apenas números ou formato válido"
       ),
     password: yup
       .string()
@@ -35,11 +35,13 @@ const Cadastro = () => {
       .min(6, "Mínimo 6 caracteres")
       .matches(
         /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[$*&@#])[0-9a-zA-Z$*&@#]{6,}$/,
-        "Senha deve conter uma letra maiúscula, um número e um desses símbolos($*&@#)"
+        "Senha deve conter uma letra maiúscula, um número e um símbolo ($*&@#)"
       ),
     confirmPassword: yup
       .string()
       .oneOf([yup.ref("password")], "Senhas não conferem"),
+    avatar: yup.string().optional(), // Deixei opcional, ajuste se for obrigatório
+    type: yup.string().required("Selecione um tipo"),
   });
 
   const {
@@ -50,30 +52,33 @@ const Cadastro = () => {
     resolver: yupResolver(formSchema),
   });
 
-  const onSubmit = (data) => {
-    axios({
-      method: "post",
-      url: `${BASE_URL}/register`,
-      data: {
-        email: `${data.email}`,
-        password: `${data.password}`,
-        name: `${data.name}`,
-        phone: "123456789",
-        avatar: `${data.avatar}`,
-        type: `${data.type}`,
-      },
-    })
-      .then((response) => {
-        toast.success("Cadastrado com sucesso");
-        history.push("/login");
-      })
-      .catch((err) => {
-        toast.error("Esse email já foi cadastrado");
-        setSignupError("Falha ao cadastrar ");
-      });
+  const onSubmit = async (data) => {
+    setSignupError("");
+    try {
+      await registerUser(data);
+
+      toast.success("Cadastro realizado! Faça login para continuar.");
+
+      history.push("/login");
+    } catch (err) {
+      console.error("Register error:", err);
+
+      const message = err?.message?.includes("already registered")
+        ? "Este e-mail já está em uso."
+        : err?.message || "Falha ao cadastrar. Verifique os dados.";
+
+      toast.error(message);
+      setSignupError(message);
+    }
   };
 
-  return !token ? (
+  // Wait for auth initialization before redirecting — avoids premature navigation
+  if (!loading && user) {
+    history.push("/");
+    return null;
+  }
+
+  return (
     <Container>
       <form onSubmit={handleSubmit(onSubmit)}>
         <h1>Cadastro</h1>
@@ -119,26 +124,27 @@ const Cadastro = () => {
         />
         <Input
           label="Avatar"
-          type="avatar"
+          type="text" // Mudei de 'avatar' para 'text' pois input type='avatar' não existe em HTML padrão
           name="avatar"
           placeholder="URL da imagem"
           error={errors.avatar?.message}
           register={register}
         />
-        <label htmlFor="type">Tipo</label>
 
+        <label htmlFor="type">Tipo</label>
+        {/* Certifique-se que seu Select retorna o valor correto para o 'register' */}
         <Select name="type" register={register} />
 
-        {signupError !== "" ? <h4>{signupError}</h4> : <></>}
+        {signupError && <h4>{signupError}</h4>}
+
         <Button type="submit">Registrar</Button>
+
         <h3>
           Já possui conta? <Link to="/login">Faça login</Link>
         </h3>
         <p>*Campos obrigatórios</p>
       </form>
     </Container>
-  ) : (
-    history.push("/")
   );
 };
 

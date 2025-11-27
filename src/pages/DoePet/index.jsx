@@ -4,7 +4,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 
-import api from "../../services/api";
+import { createPet } from "../../services/petService";
 
 import Button from "../../components/Button";
 import ButtonOutlined from "../../components/ButtonOutlined";
@@ -15,22 +15,21 @@ import * as S from "./styles";
 import InputTextArea from "../../components/InputTextArea";
 import DivSelect from "../../components/DivSelect";
 
-import { UserContext } from "../../providers/User";
-import { useContext } from "react";
 import { toast } from "react-toastify";
 import { useEffect } from "react";
+import { useAuth } from "../../providers/AuthProvider";
 
 const DoePet = () => {
   const history = useHistory();
 
-  const userInfoLocalStorage =
-    JSON.parse(localStorage.getItem("infoUser")) || {};
+  // Usar useAuth para obter usuário autenticado
+  const { user: authUser } = useAuth();
 
   useEffect(() => {
-    if (!userInfoLocalStorage.id) {
+    if (!authUser?.id) {
       history.push("/login");
     }
-  }, []);
+  }, [history, authUser?.id]);
 
   const formSchema = yup.object().shape({
     name: yup.string().required("Campo Obrigatório!"),
@@ -47,8 +46,6 @@ const DoePet = () => {
     size: yup.string().required("Campo Obrigatório!"),
   });
 
-  const { userData } = useContext(UserContext);
-
   const {
     register,
     handleSubmit,
@@ -56,24 +53,20 @@ const DoePet = () => {
   } = useForm({ resolver: yupResolver(formSchema) });
 
   const onSubmit = (data) => {
-    data.userId = userData.id;
+    // Usar authUser.id em vez de userData?.id
+    data.userId = authUser?.id;
     registerPet(data);
   };
 
-  const registerPet = (dataBody) => {
-    api
-      .post("/644/animals", dataBody, {
-        headers: {
-          Authorization: `Bearer ${userInfoLocalStorage.token}`,
-        },
-      })
-      .then((res) => {
-        toast.success("O Pet foi cadastrado");
-        history.push("/");
-      })
-      .catch((err) => {
-        toast.error("Ops! Houve algum erro");
-      });
+  const registerPet = async (dataBody) => {
+    try {
+      await createPet(dataBody);
+      toast.success("O Pet foi cadastrado");
+      history.push("/");
+    } catch (err) {
+      console.error("Erro ao cadastrar pet:", err);
+      toast.error("Ops! Houve algum erro");
+    }
   };
 
   return (
@@ -107,9 +100,9 @@ const DoePet = () => {
             error={errors.size?.message}
             isForm
           >
-            <option value="small">Pequeno</option>
-            <option value="medium">Medio</option>
-            <option value="large">Grande</option>
+            <option value="Pequeno">Pequeno</option>
+            <option value="Médio">Médio</option>
+            <option value="Grande">Grande</option>
           </DivSelect>
 
           <DivSelect
@@ -120,8 +113,8 @@ const DoePet = () => {
             error={errors.species?.message}
             isForm
           >
-            <option value="cat">Gato</option>
-            <option value="dog">Cachorro</option>
+            <option value="Gato">Gato</option>
+            <option value="Cachorro">Cachorro</option>
           </DivSelect>
 
           <DivSelect
@@ -133,8 +126,8 @@ const DoePet = () => {
             error={errors.sex?.message}
             isForm
           >
-            <option value="f">Femea</option>
-            <option value="m">Macho</option>
+            <option value="Fêmea">Fêmea</option>
+            <option value="Macho">Macho</option>
           </DivSelect>
 
           <InputTextArea

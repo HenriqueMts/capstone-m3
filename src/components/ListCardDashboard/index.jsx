@@ -19,7 +19,7 @@ import Button from "../../components/Button";
 
 import { Li, Ul } from "./styles";
 
-import api from "../../services/api";
+import { deletePet } from "../../services/petService";
 
 import { toast } from "react-toastify";
 import { useState } from "react";
@@ -31,23 +31,16 @@ const ListCardDashboard = ({ listPets }) => {
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const userInfoLocalStorage = JSON.parse(localStorage.getItem("infoUser"));
-
-  const deletePet = (id) => {
-    api
-      .delete(`/644/animals/${id}`, {
-        headers: {
-          Authorization: `Bearer ${userInfoLocalStorage.token}`,
-        },
-      })
-      .then((res) => {
-        onClose();
-        toast.success("Pet Excluído!");
-        history.push(`/adote`);
-      })
-      .catch((err) => {
-        toast.error("Ops! Houve algum erro");
-      });
+  const handleDeletePet = async (id) => {
+    try {
+      await deletePet(id);
+      onClose();
+      toast.success("Pet Excluído!");
+      history.push("/adote");
+    } catch (err) {
+      console.error("Erro ao deletar pet:", err);
+      toast.error("Ops! Houve algum erro");
+    }
   };
 
   return (
@@ -83,14 +76,16 @@ const ListCardDashboard = ({ listPets }) => {
           <AlertDialogOverlay>
             <AlertDialogContent
               m="9rem 1rem"
-              fontFamily="'Baloo Chettan 2', cursive">
+              fontFamily="'Baloo Chettan 2', cursive"
+            >
               <AlertDialogHeader
                 fontWeight="bold"
                 bgColor="var(--color-icons)"
                 color="var(--color-seven)"
                 fontSize="1.3rem"
                 borderTopRightRadius="6px"
-                borderTopLeftRadius="6px">
+                borderTopLeftRadius="6px"
+              >
                 Deletar
               </AlertDialogHeader>
 
@@ -103,9 +98,10 @@ const ListCardDashboard = ({ listPets }) => {
                 <ButtonOutlined onClick={onClose}>Cancel</ButtonOutlined>
                 <Button
                   colorScheme="red"
-                  onClick={() => deletePet(petId)}
+                  onClick={() => handleDeletePet(petId)}
                   ml={3}
-                  orangeSchema>
+                  orangeSchema
+                >
                   Delete
                 </Button>
               </AlertDialogFooter>

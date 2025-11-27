@@ -5,7 +5,7 @@ import { useParams, useHistory } from "react-router-dom";
 
 import { UserContext } from "../../providers/User";
 
-import api from "../../services/api";
+import { getPetById, getUserById } from "../../services/petService";
 
 import defaultImg from "../../assets/proprietario-default-img.svg";
 
@@ -26,12 +26,22 @@ const PagePet = () => {
 
   const { userData } = useContext(UserContext);
 
-  const getAnimalById = (id) => {
-    api.get(`/644/animals/${id}`).then((res) => setDataPet(res.data));
+  const getAnimalById = async (id) => {
+    try {
+      const pet = await getPetById(id);
+      setDataPet(pet);
+    } catch (error) {
+      console.error("Erro ao buscar pet:", error);
+    }
   };
 
-  const getUserById = (userId) => {
-    api.get(`/644/users/${userId}`).then((res) => setDataOwner(res.data));
+  const getOwnerData = async (userId) => {
+    try {
+      const owner = await getUserById(userId);
+      setDataOwner(owner);
+    } catch (error) {
+      console.error("Erro ao buscar proprietário:", error);
+    }
   };
 
   const showModal = (data) => {
@@ -43,7 +53,7 @@ const PagePet = () => {
   };
 
   const wantToAdopt = () => {
-    if (userData.id) {
+    if (userData?.id) {
       showModal();
     } else {
       history.push("/login");
@@ -52,11 +62,11 @@ const PagePet = () => {
 
   useEffect(() => {
     getAnimalById(params.id);
-  }, []);
+  }, [params.id]);
 
   useEffect(() => {
-    if (dataPet.userId) getUserById(dataPet.userId);
-  }, [dataPet]);
+    if (dataPet.userId) getOwnerData(dataPet.userId);
+  }, [dataPet.userId]);
 
   return (
     <S.GenericContainer>
@@ -106,7 +116,7 @@ const PagePet = () => {
           <ButtonOutlined callback={() => history.goBack()}>
             voltar
           </ButtonOutlined>
-          {dataPet.userId === userData.id && (
+          {dataPet.userId && userData?.id && dataPet.userId === userData.id && (
             <ButtonOutlined
               callback={() => history.push(`/user/pet/${dataPet.id}`)}
             >

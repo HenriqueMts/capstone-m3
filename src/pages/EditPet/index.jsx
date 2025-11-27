@@ -7,7 +7,7 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 
-import api from "../../services/api";
+import { getPetById, updatePet, deletePet } from "../../services/petService";
 
 import Button from "../../components/Button";
 import ButtonOutlined from "../../components/ButtonOutlined";
@@ -37,15 +37,19 @@ const EditPet = () => {
 
   const history = useHistory();
 
-  const userInfoLocalStorage = JSON.parse(localStorage.getItem("infoUser"));
-
-  const getAnimalById = (animalId) => {
-    api.get(`/644/animals/${animalId}`).then((res) => setDataPet(res.data));
+  const getAnimalById = async (animalId) => {
+    try {
+      const pet = await getPetById(animalId);
+      setDataPet(pet);
+    } catch (error) {
+      console.error("Erro ao buscar pet:", error);
+      toast.error("Erro ao carregar dados do pet");
+    }
   };
 
   useEffect(() => {
     getAnimalById(petId);
-  }, []);
+  }, [petId]);
 
   const formSchema = yup.object().shape({
     img: yup
@@ -68,39 +72,29 @@ const EditPet = () => {
     patchPet(data);
   };
 
-  const patchPet = (dataBody) => {
-    api
-      .patch(`/644/animals/${petId}`, dataBody, {
-        headers: {
-          Authorization: `Bearer ${userInfoLocalStorage.token}`,
-        },
-      })
-      .then((res) => {
-        toast.success("Alterações Salvas!");
-        history.goBack();
-      })
-      .catch((err) => {
-        toast.error("Ops! Houve algum erro");
-      });
+  const patchPet = async (dataBody) => {
+    try {
+      await updatePet(petId, dataBody);
+      toast.success("Alterações Salvas!");
+      history.goBack();
+    } catch (err) {
+      console.error("Erro ao atualizar pet:", err);
+      toast.error("Ops! Houve algum erro");
+    }
   };
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
-  const deletePet = () => {
-    api
-      .delete(`/644/animals/${petId}`, {
-        headers: {
-          Authorization: `Bearer ${userInfoLocalStorage.token}`,
-        },
-      })
-      .then((res) => {
-        onClose();
-        toast.success("Pet Excluído!");
-        history.push(`/adote`);
-      })
-      .catch((err) => {
-        toast.error("Ops! Houve algum erro");
-      });
+  const deleteAnimal = async () => {
+    try {
+      await deletePet(petId);
+      onClose();
+      toast.success("Pet Excluído!");
+      history.push("/adote");
+    } catch (err) {
+      console.error("Erro ao deletar pet:", err);
+      toast.error("Ops! Houve algum erro");
+    }
   };
 
   return (
@@ -148,14 +142,16 @@ const EditPet = () => {
                 <AlertDialogOverlay>
                   <AlertDialogContent
                     mt="10rem"
-                    fontFamily="'Baloo Chettan 2', cursive">
+                    fontFamily="'Baloo Chettan 2', cursive"
+                  >
                     <AlertDialogHeader
                       fontWeight="bold"
                       bgColor="var(--color-icons)"
                       color="var(--color-seven)"
                       fontSize="1.3rem"
                       borderTopRightRadius="6px"
-                      borderTopLeftRadius="6px">
+                      borderTopLeftRadius="6px"
+                    >
                       Deletar
                     </AlertDialogHeader>
 
@@ -166,13 +162,15 @@ const EditPet = () => {
 
                     <AlertDialogFooter
                       display="flex"
-                      justifyContent="space-between">
+                      justifyContent="space-between"
+                    >
                       <ButtonOutlined onClick={onClose}>Cancel</ButtonOutlined>
                       <Button
                         colorScheme="red"
-                        onClick={() => deletePet()}
+                        onClick={() => deleteAnimal()}
                         ml={3}
-                        orangeSchema>
+                        orangeSchema
+                      >
                         Delete
                       </Button>
                     </AlertDialogFooter>

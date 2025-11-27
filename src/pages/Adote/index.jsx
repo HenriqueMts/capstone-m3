@@ -1,11 +1,10 @@
-import { useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import DivSelect from "../../components/DivSelect";
 import ListCard from "../../components/ListCard";
 import FooterChat from "../../components/footer-Chat";
 
-import api from "../../services/api";
+import { getPets } from "../../services/petService";
 
 import { Container, ContentTotal, ContentFiltro, ContentList } from "./styles";
 import iconFilter from "../../assets/filterIcon.svg";
@@ -31,21 +30,40 @@ const Adote = () => {
   const [species, setSpecies] = useState("");
   const [size, setSizes] = useState("");
   const [name, setName] = useState("");
+  const [listpets, setListpets] = useState([]);
+
+  const filters = async () => {
+    setLoading(true);
+    try {
+      const filtersObj = {
+        name: name || undefined,
+        sex: sex || undefined,
+        species: species || undefined,
+        size: size || undefined,
+      };
+
+      // Remove undefined values
+      Object.keys(filtersObj).forEach((key) => {
+        if (filtersObj[key] === undefined) {
+          delete filtersObj[key];
+        }
+      });
+
+      console.log("Adote - Filtros enviados:", filtersObj);
+      const pets = await getPets(filtersObj);
+      console.log("Adote - Pets recebidos:", pets);
+      setListpets(pets);
+    } catch (error) {
+      console.error("Erro ao buscar pets:", error);
+      setListpets([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     filters();
   }, [sex, name, size, species]);
-
-  const [listpets, setListpets] = useState([]);
-
-  const filters = () => {
-    setLoading(true);
-    api.get(`/animals?${name}${sex}${species}${size}`).then((res) => {
-      setListpets(res.data);
-      setLoading(false);
-    });
-  };
-
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   const resetFilter = () => {
@@ -72,9 +90,9 @@ const Adote = () => {
               error={""}
               setSelect={setSizes}
             >
-              <option value="small">Pequeno</option>
-              <option value="medium">Medio</option>
-              <option value="large">Grande</option>
+              <option value="Pequeno">Pequeno</option>
+              <option value="Médio">Médio</option>
+              <option value="Grande">Grande</option>
             </DivSelect>
 
             <DivSelect
@@ -84,8 +102,8 @@ const Adote = () => {
               error={""}
               setSelect={setSpecies}
             >
-              <option value="cat">Gato</option>
-              <option value="dog">Cachorro</option>
+              <option value="Gato">Gato</option>
+              <option value="Cachorro">Cachorro</option>
             </DivSelect>
 
             <DivSelect
@@ -96,8 +114,8 @@ const Adote = () => {
               error={""}
               setSelect={setSex}
             >
-              <option value="f">Femea</option>
-              <option value="m">Macho</option>
+              <option value="Fêmea">Fêmea</option>
+              <option value="Macho">Macho</option>
             </DivSelect>
           </div>
 
@@ -139,9 +157,9 @@ const Adote = () => {
                       error={""}
                       setSelect={setSizes}
                     >
-                      <option value="small">Pequeno</option>
-                      <option value="medium">Medio</option>
-                      <option value="large">Grande</option>
+                      <option value="Pequeno">Pequeno</option>
+                      <option value="Médio">Médio</option>
+                      <option value="Grande">Grande</option>
                     </DivSelect>
 
                     <DivSelect
@@ -151,8 +169,8 @@ const Adote = () => {
                       error={""}
                       setSelect={setSpecies}
                     >
-                      <option value="cat">Gato</option>
-                      <option value="dog">Cachorro</option>
+                      <option value="Gato">Gato</option>
+                      <option value="Cachorro">Cachorro</option>
                     </DivSelect>
 
                     <DivSelect
@@ -163,8 +181,8 @@ const Adote = () => {
                       error={""}
                       setSelect={setSex}
                     >
-                      <option value="f">Femea</option>
-                      <option value="m">Macho</option>
+                      <option value="Fêmea">Fêmea</option>
+                      <option value="Macho">Macho</option>
                     </DivSelect>
                   </div>
                 </DrawerBody>

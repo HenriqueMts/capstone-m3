@@ -13,9 +13,10 @@ const DivSelect = ({
   setSelect,
 }) => {
   const filter = (value) => {
-    const setFilter = name + value + "&";
+    // Para filtros: enviar apenas o valor selecionado
+    // Para formulários: será controlado pelo register do react-hook-form
     if (!isForm) {
-      value ? setSelect(setFilter) : setSelect("");
+      setSelect(value);
     }
   };
 
@@ -43,7 +44,8 @@ const DivSelect = ({
           _focus={{
             borderColor: "#FF8E15",
           }}
-          onChange={(e) => filter(e.target.value)}>
+          onChange={(e) => filter(e.target.value)}
+        >
           {children}
         </Select>
       </ChakraProvider>

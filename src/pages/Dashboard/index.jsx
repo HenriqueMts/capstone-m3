@@ -1,10 +1,9 @@
-import { useContext, useEffect } from "react";
-import { useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 
 import DivSelect from "../../components/DivSelect";
 import ButtonComponent from "../../components/Button";
 
-import api from "../../services/api";
+import { getPets } from "../../services/petService";
 
 import { Container, ContentTotal, ContentFiltro, ContentList } from "./styles";
 import iconFilter from "../../assets/filterIcon.svg";
@@ -23,9 +22,9 @@ import {
   Spinner,
 } from "@chakra-ui/react";
 import InputSeach from "../../components/inputSeach";
-import { UserContext } from "../../providers/User";
 import ListCardDashboard from "../../components/ListCardDashboard";
 import { useHistory } from "react-router-dom";
+import { useAuth } from "../../providers/AuthProvider";
 
 const Dashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -33,26 +32,51 @@ const Dashboard = () => {
   const [species, setSpecies] = useState("");
   const [size, setSizes] = useState("");
   const [name, setName] = useState("");
-
-  const history = useHistory();
-
-  const { userData } = useContext(UserContext);
-
-  useEffect(() => {
-    filters();
-  }, [sex, name, size, species, userData]);
-
   const [listpets, setListpets] = useState([]);
 
-  const filters = () => {
+  const history = useHistory();
+  const { user: authUser } = useAuth();
+
+  // Redirecionar se não estiver logado
+  useEffect(() => {
+    if (!authUser?.id) {
+      history.push("/login");
+    }
+  }, [authUser?.id, history]);
+
+  const filters = useCallback(async () => {
     setLoading(true);
-    api
-      .get(`/644/animals?userId=${userData.id}&${name}${sex}${species}${size}`)
-      .then((res) => {
-        setListpets(res.data);
-        setLoading(false);
+    try {
+      const filtersObj = {
+        userId: authUser?.id,
+        name: name || undefined,
+        sex: sex || undefined,
+        species: species || undefined,
+        size: size || undefined,
+      };
+
+      // Remove undefined values
+      Object.keys(filtersObj).forEach((key) => {
+        if (filtersObj[key] === undefined) {
+          delete filtersObj[key];
+        }
       });
-  };
+
+      const pets = await getPets(filtersObj);
+      setListpets(pets);
+    } catch (error) {
+      console.error("Erro ao buscar pets:", error);
+      setListpets([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [authUser?.id, name, sex, species, size]);
+
+  useEffect(() => {
+    if (authUser?.id) {
+      filters();
+    }
+  }, [authUser?.id, filters]);
 
   const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -80,9 +104,9 @@ const Dashboard = () => {
               error={""}
               setSelect={setSizes}
             >
-              <option value="small">Pequeno</option>
-              <option value="medium">Medio</option>
-              <option value="large">Grande</option>
+              <option value="Pequeno">Pequeno</option>
+              <option value="Médio">Médio</option>
+              <option value="Grande">Grande</option>
             </DivSelect>
 
             <DivSelect
@@ -92,8 +116,8 @@ const Dashboard = () => {
               error={""}
               setSelect={setSpecies}
             >
-              <option value="cat">Gato</option>
-              <option value="dog">Cachorro</option>
+              <option value="Gato">Gato</option>
+              <option value="Cachorro">Cachorro</option>
             </DivSelect>
 
             <DivSelect
@@ -104,8 +128,8 @@ const Dashboard = () => {
               error={""}
               setSelect={setSex}
             >
-              <option value="f">Femea</option>
-              <option value="m">Macho</option>
+              <option value="Fêmea">Fêmea</option>
+              <option value="Macho">Macho</option>
             </DivSelect>
           </div>
 
@@ -147,9 +171,9 @@ const Dashboard = () => {
                       error={""}
                       setSelect={setSizes}
                     >
-                      <option value="small">Pequeno</option>
-                      <option value="medium">Medio</option>
-                      <option value="large">Grande</option>
+                      <option value="Pequeno">Pequeno</option>
+                      <option value="Médio">Médio</option>
+                      <option value="Grande">Grande</option>
                     </DivSelect>
 
                     <DivSelect
@@ -159,8 +183,8 @@ const Dashboard = () => {
                       error={""}
                       setSelect={setSpecies}
                     >
-                      <option value="cat">Gato</option>
-                      <option value="dog">Cachorro</option>
+                      <option value="Gato">Gato</option>
+                      <option value="Cachorro">Cachorro</option>
                     </DivSelect>
 
                     <DivSelect
@@ -171,8 +195,8 @@ const Dashboard = () => {
                       error={""}
                       setSelect={setSex}
                     >
-                      <option value="f">Femea</option>
-                      <option value="m">Macho</option>
+                      <option value="Fêmea">Fêmea</option>
+                      <option value="Macho">Macho</option>
                     </DivSelect>
                   </div>
                 </DrawerBody>

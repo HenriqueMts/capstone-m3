@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 import { useContext, useEffect, useState } from "react";
 
-import api from "../../services/api";
+import { getUserById } from "../../services/petService";
 
 import Logo from "../../assets/Logo.svg";
 import HomeIcon from "../../assets/HomeIcon.svg";
@@ -15,14 +15,15 @@ import Button from "../Button";
 import { Container, Content, DivInfoUser, ExternalContainer } from "./styles";
 import { useHistory } from "react-router-dom";
 import { UserContext } from "../../providers/User";
+import { useAuth } from "../../providers/AuthProvider";
 
 const Header = () => {
   const history = useHistory();
 
   const [handleButton, setHandleButton] = useState(false);
 
-  const userInfoLocalStorage =
-    JSON.parse(localStorage.getItem("infoUser")) || {};
+  // Usar o user do AuthProvider (sempre sincronizado com Supabase)
+  const { user: authUser, logout } = useAuth();
 
   const { userData, updateUserData } = useContext(UserContext);
 
@@ -39,22 +40,58 @@ const Header = () => {
     history.push("/login");
   };
 
-  const loggoutAndGoToHome = () => {
-    localStorage.clear();
-    updateUserData({});
-    history.push("/");
+  const loggoutAndGoToHome = async () => {
+    try {
+      await logout(); // Logout real via Supabase
+      updateUserData({}); // Limpar dados do usuário no contexto
+      localStorage.clear();
+      history.push("/");
+    } catch (err) {
+      console.error("Erro ao fazer logout:", err);
+    }
   };
 
-  const getUserById = (id) => {
-    api
-      .get("/644/users/" + id)
-      .then((res) => updateUserData(res.data))
-      .catch((err) => console.log(err));
+  const handleGetUserData = async (id) => {
+    try {
+      // Priorizar dados da metadata do auth (salvos no signup)
+      // Esses dados SEMPRE existem se o cadastro foi feito
+      if (authUser?.user_metadata?.full_name) {
+        const userData = {
+          id: authUser.id,
+          name: authUser.user_metadata.full_name,
+          email: authUser.email,
+          phone: authUser.user_metadata.phone || "",
+          avatar: authUser.user_metadata.avatar_url || "",
+          role: authUser.user_metadata.role || "adotante",
+        };
+        updateUserData(userData);
+      } else {
+        // Fallback: se não houver full_name na metadata, tentar buscar de profiles
+        const userData = await getUserById(id);
+        updateUserData(userData);
+      }
+    } catch (err) {
+      console.error("Erro ao buscar dados do usuário:", err);
+      // Último fallback: criar userData com email ao menos
+      if (authUser?.email) {
+        updateUserData({
+          id: authUser.id,
+          name: authUser.email,
+          email: authUser.email,
+        });
+      }
+    }
   };
 
+  // Quando authUser muda (login/logout), buscar dados do perfil
   useEffect(() => {
-    if (userInfoLocalStorage.id) getUserById(userInfoLocalStorage.id);
-  }, []);
+    if (authUser?.id) {
+      handleGetUserData(authUser.id);
+    } else {
+      updateUserData({});
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authUser?.id]);
 
   return (
     <ExternalContainer>
@@ -77,8 +114,9 @@ const Header = () => {
             </li>
             <li>
               <Link
-                to={userInfoLocalStorage.id ? "/user/pets" : "/login"}
-                onClick={closeMenu}>
+                to={authUser?.id ? "/user/pets" : "/login"}
+                onClick={closeMenu}
+              >
                 <img src={SortIcon} alt="Sort" /> Doe um Pet
               </Link>
             </li>
@@ -88,7 +126,7 @@ const Header = () => {
                 Contribua
               </Link>
             </li>
-            {userData.id ? (
+            {userData?.id ? (
               <DivInfoUser>
                 <img src={userData.avatar || defaultImg} alt="" />
                 <div>
@@ -108,7 +146,8 @@ const Header = () => {
         <button
           id="burger"
           className={handleButton ? "burger active" : "burger "}
-          onClick={() => buttonClick()}>
+          onClick={() => buttonClick()}
+        >
           <span className="btn--burger"></span>
         </button>
       </Container>

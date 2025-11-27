@@ -1,4 +1,4 @@
-import { Route } from "react-router-dom";
+import { Route, Redirect } from "react-router-dom";
 import { Switch } from "react-router-dom";
 import Adote from "../pages/Adote";
 import Cadastro from "../pages/Cadastro";
@@ -21,6 +21,15 @@ const Routers = () => {
       {/*  */}
       <Route exact path="/cadastro">
         <Cadastro />
+      </Route>
+
+      {/* alias for old/alternate path */}
+      <Route exact path="/registrar">
+        <Redirect to="/cadastro" />
+      </Route>
+      {/* alias for English path */}
+      <Route exact path="/register">
+        <Redirect to="/cadastro" />
       </Route>
 
       <Route exact path="/contribua">
