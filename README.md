@@ -97,7 +97,7 @@ The project was migrated to a relational database to ensure **Data Integrity** a
 
 <div align="center">
   <h3>
-    <a href="https://adopet-m3.vercel.app/">
+    <a href="https://capstone-m3-kappa.vercel.app">
       👉 Click here to visit AdoPet
     </a>
   </h3>
