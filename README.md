@@ -1,3 +1,6 @@
+<div align="center">
+  <img src="src/assets/Logo.svg" alt="Adopet Logo" width="150"/>
+
 # AdoPet
 
 **Connecting hearts, one paw at a time.**
@@ -91,3 +94,11 @@ The project was migrated to a relational database to ensure **Data Integrity** a
 ---
 
 ## 🔗 Live Demo
+
+<div align="center">
+  <h3>
+    <a href="https://adopet-m3.vercel.app/">
+      👉 Click here to visit AdoPet
+    </a>
+  </h3>
+</div>
