@@ -32,29 +32,22 @@ const Home = () => {
     }
   };
 
-  // Sempre renderizamos as 3 primeiras sections.
-  // Se houver pets (após carregamento), mostramos também a lista de destaque, a section 5 e o footer.
   return (
     <Main>
       <SectionHomePart1 />
       <SectionHomePart2 />
       <SectionHomePart3 />
+
+      {!loading && listPet && listPet.length > 0 && (
+        <ContainerListPets>
+          <h2>Animais em Destaque</h2>
+          <div>
+            <ListCard listPets={listPet} />
+          </div>
+        </ContainerListPets>
+      )}
       <SectionHomePart5 />
       <Footer />
-
-      {/* Mostrar animais em destaque somente se já carregou e houver itens */}
-      {!loading && listPet && listPet.length > 0 && (
-        <>
-          <ContainerListPets>
-            <h2>Animais em Destaque</h2>
-            <div>
-              <ListCard listPets={listPet} />
-            </div>
-          </ContainerListPets>
-          <SectionHomePart5 />
-          <Footer />
-        </>
-      )}
     </Main>
   );
 };
