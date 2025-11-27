@@ -1,72 +1,93 @@
-# ![Adopet](src/assets/Logo.svg)
+# AdoPet
 
-**AdoPet** Was developed to connect peoples hos want to adopt a pet with hos need's a new home for the pets.
+**Connecting hearts, one paw at a time.**
 
-## Issues to be solved
+  <img src="https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB" alt="React" />
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase" />
+  <img src="https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Styled_Components-DB7093?style=for-the-badge&logo=styled-components&logoColor=white" alt="Styled Components" />
+  <img src="https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white" alt="Figma" />
 
-Adopet aims to help build a bridge between different NGOs and pet lovers.
+  <br />
 
-World Health Organization estimate's just in Brazil there are more than 30 millions homeless animals ho's need health care.
+[Description](#-project-description) •
+[Architecture](#-architecture--database) •
+[Features](#-features) •
+[Technologies](#-technologies) •
+[Team](#-team)
 
-The biggest dificulty is tri finding someone who's resposible and takes care of the animal, our plataform gives the user informations that are crucial to find the best person's possible.
-
-is important to remind our platform just connect NGOs with people, we don't responsible to deliver the animal.
-
----
-
-## Features
-
-- Home
-- Cadastro
-- Login
-- Adote
-  - Pagina do pet
-- Contribua
-- Doar Pet
-- DashBoard
-  - Edite Pet
+</div>
 
 ---
 
-## Technologies
+## 📄 Project Description
 
-- ReactJS
+**AdoPet** was developed to connect people who want to adopt a pet with those looking for a new home for rescued animals.
 
-- Context API
+> 🚀 **Major Update (2025):** This project has been refactored from a mock environment (FakeAPI/JSON Server) to a production-grade architecture using **PostgreSQL** and **Supabase**. It now features real authentication, row-level security, and persistent data storage.
 
-- Figma
+### Issues to be solved
 
-- JSON Server
+The World Health Organization estimates that in Brazil alone, there are over **30 million homeless animals** in need of healthcare and shelter. The biggest difficulty is finding responsible guardians.
 
----
-
-## Lib's
-
-- Styled Components
-- Chakra
-- Yup
-- Axios
-- React Hook Form
-- React Router Dom
-- React Toastify
-- React ICons
-- JSON Server Auth
+Our platform aims to bridge the gap between NGOs and pet lovers, providing crucial information to ensure the best possible match between the pet and the adopter.
 
 ---
 
-## Team
+## 🏗 Architecture & Database
 
-- [Douglas Leão -QA](https://github.com/elefantinhos2)
-- [Eduardo Henrique -QA](https://github.com/HenriqueMts)
-- [Emilly Almeida -PO](https://github.com/Emillyalmeida)
-- [Jonatas Souza -SM](https://github.com/jotasouza)
-- [Thales Renan -QA](https://github.com/thalesrenan)
-- [Weriks Santos -TL](https://github.com/werikscs)
+The project was migrated to a relational database to ensure **Data Integrity** and **Security**.
+
+- **Database:** PostgreSQL (via Supabase).
+- **Authentication:** Managed via Supabase Auth (JWT) - separates "User" from "Data".
+- **Security:** Implemented Row Level Security (RLS) policies.
+- **Automation:** Database Triggers automatically sync Auth Users with Public Profiles.
+- **Storage:** Images served via Supabase Storage buckets.
 
 ---
 
-## Links
+## ✨ Features
 
-### [Adopet](https://adopet-m3.vercel.app/)
+- 🔐 **Authentication:** Secure Login and Registration for Adopters and NGOs.
+- 🐶 **Home Feed:** Listing of available pets with filters (Species, Size, etc.).
+- 📄 **Pet Profile:** Detailed view of the animal with photos and description.
+- 🏥 **Contribute:** Information on how to help partner NGOs.
+- ➕ **Donate/Register Pet:** Form to register new animals for adoption.
+- 📊 **Dashboard:** Manage your registered pets, edit details, or mark them as adopted.
 
-### [Fake API](https://github.com/werikscs/json-server-base)
+---
+
+## 💻 Technologies
+
+### Core
+
+- **ReactJS**
+- **Context API** (State Management)
+- **Supabase** (BaaS - Backend as a Service)
+
+### Libraries & Tools
+
+- `@supabase/supabase-js`
+- `react-hook-form` & `yup` (Forms & Validation)
+- `styled-components` (Styling)
+- `react-router-dom` (Routing)
+- `react-toastify` (Feedback)
+- `react-icons`
+- `chakra-ui`
+
+---
+
+## 👥 Team
+
+| Member               | Role          | GitHub                                     |
+| :------------------- | :------------ | :----------------------------------------- |
+| **Weriks Santos**    | Tech Lead     | [Github](https://github.com/werikscs)      |
+| **Eduardo Henrique** | QA / Dev      | [Github](https://github.com/HenriqueMts)   |
+| **Douglas Leão**     | QA            | [Github](https://github.com/elefantinhos2) |
+| **Emilly Almeida**   | Product Owner | [Github](https://github.com/Emillyalmeida) |
+| **Jonatas Souza**    | Scrum Master  | [Github](https://github.com/jotasouza)     |
+| **Thales Renan**     | QA            | [Github](https://github.com/thalesrenan)   |
+
+---
+
+## 🔗 Live Demo
